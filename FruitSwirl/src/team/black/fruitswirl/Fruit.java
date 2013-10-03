@@ -21,25 +21,41 @@ public class Fruit extends FlxSprite {
 	public static final int FLIP_DOWN	= 0x1000;
 	
 	
-	private int curState;
+	private int currentState;
 	private int flipDirection;
 	
 	public Fruit(float _ix, float _iy){
 		super(_ix, _iy);
-		curState = STATE_NONE;
-		flipDirection = FLIP_NONE;
+		setCurrentState(STATE_NONE);
+		setFlipDirection(FLIP_NONE);
 	}
 	
 	public Fruit(float _ix, float _iy, int _initState){
 		super(_ix, _iy);
-		curState = _initState;
-		flipDirection = FLIP_NONE;
+		setCurrentState(_initState);
+		setFlipDirection(FLIP_NONE);
 	}
 	
 	
 	@Override
 	public void update(){
 		super.update();
+	}
+
+	public int getCurrentState() {
+		return currentState;
+	}
+
+	public void setCurrentState(int curState) {
+		this.currentState = curState;
+	}
+
+	public int getFlipDirection() {
+		return flipDirection;
+	}
+
+	public void setFlipDirection(int flipDirection) {
+		this.flipDirection = flipDirection;
 	}
 	
 }
