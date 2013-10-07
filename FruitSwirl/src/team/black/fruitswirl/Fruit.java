@@ -5,11 +5,11 @@ import org.flixel.FlxSprite;
 public class Fruit extends FlxSprite {
 	
 	public static final int STATE_NONE		= 0x00000000;
-	public static final int STATE_NORMAL 	= 0x00000001;
+	public static final int STATE_NORMAL	= 0x00000001;
 	public static final int STATE_FIRE 		= 0x00000010;
 	public static final int STATE_ELEC 		= 0x00000100;
-	public static final int STATE_LOCKING 	= 0x00001000;
-	public static final int STATE_LOCKED 	= 0x00010000;
+	public static final int STATE_LOCKING	= 0x00001000;
+	public static final int STATE_LOCKED	= 0x00010000;
 	public static final int STATE_DESTROY	= 0x00100000;
 	public static final int STATE_FALLING	= 0x01000000;
 	public static final int STATE_FLIPPING	= 0x10000000;
