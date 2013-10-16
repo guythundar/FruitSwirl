@@ -36,6 +36,9 @@ public class Fruit extends FlxSprite {
 		setFlipDirection(FLIP_NONE);
 	}
 	
+	public void makeTestSprite(int color){
+		makeGraphic(16, 16, color);
+	}
 	
 	@Override
 	public void update(){
