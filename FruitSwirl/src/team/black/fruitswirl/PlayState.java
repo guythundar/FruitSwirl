@@ -13,7 +13,7 @@ public class PlayState extends FlxState
 		FlxSprite bg = new FlxSprite(0,0);
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFF0000FF);
 		add(bg);
-		add(new FlxText(0, 0, 200, "Testing Testing...."));
-		FlxG.log("Foo");
+		add(new FlxText(0, 0, 600, "FruitSwirl Demo. Mind the bugs." + Rg.rng.nextInt()));
+		
 	}
 }
