@@ -6,6 +6,6 @@ public class MainActivity extends FlxAndroidApplication
 {
     public MainActivity()
 	{
-		super(new FlixelGame());
+    	super(new FlixelGame());
 	}
 }

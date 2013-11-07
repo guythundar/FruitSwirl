@@ -6,6 +6,6 @@ public class FlixelGame extends FlxGame
 {
 	public FlixelGame()
 	{
-		super(500, 240, PlayState.class, 2, 50, 50, false);
+		super(500, 250, PlayState.class, 1, 50, 50, false);
 	}
 }
