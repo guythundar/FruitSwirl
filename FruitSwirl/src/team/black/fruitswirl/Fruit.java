@@ -1,12 +1,15 @@
 package team.black.fruitswirl;
 
+import org.flixel.FlxG;
+import org.flixel.FlxPath;
+import org.flixel.FlxPoint;
 import org.flixel.FlxSprite;
 
 public class Fruit extends FlxSprite {
 	
-	public static final int DEFAULT_POINT_VALUE = 1;
-	public static final int FIRE_POINT_VALUE = 3;
-	public static final int ELEC_POINT_VALUE = 5;
+	public static final int POINT_VALUE_NORMAL = 1;
+	public static final int POINT_VALUE_FIRE = 3;
+	public static final int POINT_VALUE_ELEC = 5;
 	
 	public static final int SIZE_X = 20;
 	public static final int SIZE_Y = 20;
@@ -19,34 +22,33 @@ public class Fruit extends FlxSprite {
 	public static final int STATE_LOCKED	= 0x00010000;
 	public static final int STATE_DESTROY	= 0x00100000;
 	public static final int STATE_FALLING	= 0x01000000;
-	public static final int STATE_FLIPPING	= 0x10000000;
+	public static final int STATE_ROTATE	= 0x10000000;
 	
-	public static final int FLIP_NONE	= 0x0000;
-	public static final int FLIP_LEFT	= 0x0001;
-	public static final int FLIP_RIGHT	= 0x0010;
-	public static final int FLIP_UP		= 0x0100;
-	public static final int FLIP_DOWN	= 0x1000;
+	public static final int ROTATE_NONE	= 0x0000;
+	public static final int ROTATE_LEFT	= 0x0001;
+	public static final int ROTATE_RIGHT = 0x0010;
+	public static final int ROTATE_UP = 0x0100;
+	public static final int ROTATE_DOWN	= 0x1000;
 	
 	public long UID;
 	
 	private int currentState;
-	private int flipDirection;
+	private int rotateDirection;
+	private boolean hasStartedPathing = false;
 	
-	public int gridx, gridy;
-	
-	public Fruit(float _ix, float _iy, int _gridx, int _gridy){
+	public Fruit(float _ix, float _iy){
 		super(_ix, _iy);
-		setCurrentState(STATE_NONE);
-		setFlipDirection(FLIP_NONE);
+		setCurrentState(STATE_NORMAL);
+		setRotateDirection(ROTATE_NONE);
 		UID = Rg.rng.nextLong();
-		gridx = _gridx;
-		gridy = _gridy;
+		visible = true;
 	}
 		
 	public Fruit(float _ix, float _iy, int _initState){
 		super(_ix, _iy);
 		setCurrentState(_initState);
-		setFlipDirection(FLIP_NONE);
+		setRotateDirection(ROTATE_NONE);
+		UID = Rg.rng.nextLong();
 	}
 	
 	public void makeTestSprite(int color){
@@ -56,8 +58,47 @@ public class Fruit extends FlxSprite {
 	@Override
 	public void update(){
 		super.update();
+		
+		
+		if ( currentState == STATE_ROTATE ){
+			FlxG.log("i feel like rotating");
+			if ( pathSpeed == 0 ){
+				stopFollowingPath(true);
+				velocity.x = velocity.y = 0;
+				setCurrentState(STATE_NORMAL);
+				setRotateDirection(ROTATE_NONE);
+			}
+		}
+		
 	}
 
+	private int mx = (SIZE_X / 2),
+			    my = (SIZE_Y / 2);
+	
+	public void startPathing(){
+		if ( !hasStartedPathing && currentState == STATE_ROTATE && rotateDirection != ROTATE_NONE){
+			FlxPath path = new FlxPath();
+			switch(rotateDirection){
+				case ROTATE_DOWN:
+					path.add(x+mx, y+my+SIZE_Y);
+				break;
+				case ROTATE_UP:
+					path.add(x+mx, y-SIZE_Y+my);
+				break;
+				case ROTATE_RIGHT:
+					path.add(x+mx +SIZE_X, y+my);
+				break;
+				case ROTATE_LEFT:
+					path.add(x-SIZE_X+mx, y+my);
+				break;
+				default:break;
+			}
+			
+			followPath(path, 50);
+			hasStartedPathing = true;
+		}
+	}
+	
 	public int getCurrentState() {
 		return currentState;
 	}
@@ -66,12 +107,22 @@ public class Fruit extends FlxSprite {
 		this.currentState = curState;
 	}
 
-	public int getFlipDirection() {
-		return flipDirection;
+	public int getRotateDirection() {
+		return rotateDirection;
 	}
 
-	public void setFlipDirection(int flipDirection) {
-		this.flipDirection = flipDirection;
+	public void setRotateDirection(int dir) {
+		this.rotateDirection = dir;
+	}
+	
+	public int getValue(){
+		if ( currentState == STATE_NORMAL )
+			return POINT_VALUE_NORMAL;
+		else if ( currentState == STATE_FIRE )
+			return POINT_VALUE_FIRE;
+		else if ( currentState == STATE_ELEC )
+			return POINT_VALUE_ELEC;
+		else return 0;
 	}
 	
 }
