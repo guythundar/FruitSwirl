@@ -1,7 +1,6 @@
 package team.black.fruitswirl;
 
 import java.awt.Point;
-
 import org.flixel.FlxPoint;
 import org.flixel.FlxSprite;
 
@@ -9,8 +8,8 @@ public class Spinner extends FlxSprite {
 
 	private boolean justMoved = false;
 	private FlxPoint initPos = new FlxPoint();
-	public FlxPoint initCollidePos = new FlxPoint(0, Grid.FRUITS_PER_COL);
-	public FlxPoint collidePos = new FlxPoint();
+	private Point initCollidePos = new Point(0, Grid.FRUITS_PER_COL);
+	public Point collidePos = new Point();
 	
 	public boolean hasJustMoved() {
 		return justMoved;
@@ -23,6 +22,7 @@ public class Spinner extends FlxSprite {
 	public Spinner(float X, float Y) {
 		super(X, Y);
 		loadGraphic("spinner.png");
+		collidePos = initCollidePos;
 	}
 	
 	@Override

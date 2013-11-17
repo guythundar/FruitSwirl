@@ -19,13 +19,20 @@ public class Grid {
 	 */
 	public FlxGroup fruits = new FlxGroup();
 	
+	
 	/**
-	 * currentFruits contains a integar that identifies the type of Fruit that
+	 * currentFruits
+	 */
+	public Fruit[][] currentFruits = new Fruit[FRUITS_PER_ROW][FRUITS_PER_COL*2];
+	
+	
+	/**
+	 * currentChoices contains a int that identifies the type of Fruit that
 	 * is in the grid. It does not contain any reference to the Fruit itself or
 	 * its drawing location, though both can be inferred.
 	 * 
 	 */
-	public int[][] currentFruits = new int[FRUITS_PER_ROW][FRUITS_PER_COL*2];
+	public int[][] currentChoices = new int[FRUITS_PER_ROW][FRUITS_PER_COL*2];
 	
 	/**
 	 * gPoints is a set of FlxPoints that are used to check where the player has
@@ -71,13 +78,27 @@ public class Grid {
 	private void clearChoices(){
 		for ( int i = 0; i < FRUITS_PER_ROW; i++){
 			for ( int j = 0; j < FRUITS_PER_COL*2; j++){
-				currentFruits[i][j] = -1;
+				currentChoices[i][j] = -1;
 			}
 		}
 	}
 	
 	
 	public void makeFirstBoard(){
+		getFirstChoices();
+		choicesToFruits();
+		updateDrawables();
+		
+		//hide the off screen members
+		for ( int i = 0; i < fruits.length; i++){
+			Fruit f = (Fruit) fruits.members.get(i);
+			if (f.y < minPoint.y)
+				f.visible = false;
+		}
+	}
+	
+	
+	private void getFirstChoices(){
 		fruits.clear();
 		clearChoices();
 		
@@ -86,59 +107,73 @@ public class Grid {
 		
 		
 		for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
-			for ( int j = -FRUITS_PER_COL; j < FRUITS_PER_COL; j++ ){				
+			for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){				
 				while(!ok){
 					
 					choice = Rg.rng.nextInt(5);
 					
 					//case first fruit
-					if ( i == 0 && j == -FRUITS_PER_COL )
+					if ( i == 0 && j == 0 )
 						ok = true;
 					else{
 						//this is going to be ugly, its needs to be handled better somehow
-						int ci = i, cj = j + FRUITS_PER_COL;
 						//horizontal cases
-						if ( ((ci - 1 > -1 && choice == currentFruits[ci-1][cj]) && (ci + 1 < FRUITS_PER_ROW && choice == currentFruits[ci+1][cj])) ||
-							 ((ci - 1 > -1 && choice == currentFruits[ci-1][cj]) && (ci - 2 > -1 && choice == currentFruits[ci-2][cj])) ||
-							 ((ci + 1 < FRUITS_PER_ROW && choice == currentFruits[ci+1][cj]) && (ci + 2 < FRUITS_PER_ROW && choice == currentFruits[ci+2][cj]))
+						if ( ((i - 1 > -1 && choice == currentChoices[i-1][i]) && (i + 1 < FRUITS_PER_ROW && choice == currentChoices[i+1][i])) ||
+							 ((i - 1 > -1 && choice == currentChoices[i-1][i]) && (i - 2 > -1 && choice == currentChoices[i-2][i])) ||
+							 ((i + 1 < FRUITS_PER_ROW && choice == currentChoices[i+1][i]) && (i + 2 < FRUITS_PER_ROW && choice == currentChoices[i+2][i]))
 							)
 							continue;
 						//vertical cases
-						else if( ((cj - 1 > -1 && choice == currentFruits[ci][cj-1]) && (cj + 1 < FRUITS_PER_COL*2 && choice == currentFruits[ci][cj+1])) ||
-								 ((cj - 1 > -1 && choice == currentFruits[ci][cj-1]) && (cj - 2 > -1 && choice == currentFruits[ci][cj-2])) ||
-								 ((cj + 1 < FRUITS_PER_COL*2 && choice == currentFruits[ci][cj+1]) && (cj + 2 < FRUITS_PER_COL*2 && choice == currentFruits[ci][cj+2]))
+						else if( ((i - 1 > -1 && choice == currentChoices[i][i-1]) && (i + 1 < FRUITS_PER_COL*2 && choice == currentChoices[i][i+1])) ||
+								 ((i - 1 > -1 && choice == currentChoices[i][i-1]) && (i - 2 > -1 && choice == currentChoices[i][i-2])) ||
+								 ((i + 1 < FRUITS_PER_COL*2 && choice == currentChoices[i][i+1]) && (i + 2 < FRUITS_PER_COL*2 && choice == currentChoices[i][i+2]))
 								)
 							continue;
 						else ok = true;
 					}
 					
 				}
-				currentFruits[i][j+FRUITS_PER_COL] = choice;
+				currentChoices[i][j] = choice;
 				ok = false;
-				
-				float pi = minPoint.x + (i * Fruit.SIZE_X),
-					  pj = minPoint.y + (j * Fruit.SIZE_Y);				
-				if ( choice == 0 )
-					fruits.add(new Apple(pi,pj));
-				else if ( choice == 1 )
-					fruits.add(new Grape(pi,pj));
-				else if ( choice == 2 )
-					fruits.add(new Orange(pi, pj));
-				else if ( choice == 3 )
-					fruits.add(new Watermelon(pi, pj));
-				else fruits.add(new Lemon(pi, pj));
-				
 				
 			}
 		}
-		
-		//hide the off screen members
-		for ( int i = 0; i < fruits.length; i++){
-			Fruit f = (Fruit) fruits.members.get(i);
-			if (f.y < minPoint.y)
-				f.visible = false;
+				
+	}
+	
+	private void choicesToFruits(){
+		for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
+			for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){				
+				int choice = currentChoices[i][j];
+				float pi = minPoint.x + (i * Fruit.SIZE_X),
+					  pj = minPoint.y + ((j-FRUITS_PER_COL) * Fruit.SIZE_Y);				
+				if ( choice == 0 )
+					currentFruits[i][j] = new Apple(pi,pj);
+				else if ( choice == 1 )
+					currentFruits[i][j] = new Grape(pi,pj);
+				else if ( choice == 2 )
+					currentFruits[i][j] = new Orange(pi,pj);
+				else if ( choice == 3 )
+					currentFruits[i][j] = new Watermelon(pi,pj);
+				else currentFruits[i][j] = new Lemon(pi,pj);
+			}
 		}
-		
+	}
+	
+	/**
+	 * updateDrawables takes the members of int[][] currentFruits and copies
+	 * them to FlxGroup fruits. This operation is semi-expensive as it will
+	 * cause the entire grid to have to be re-rendered.
+	 * 
+	 */
+	
+	public void updateDrawables(){
+		fruits.clear();
+		for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
+			for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){
+				fruits.add(currentFruits[i][j]);
+			}
+		}
 	}
 	
 	
@@ -151,13 +186,13 @@ public class Grid {
 	 * 
 	 */
 	private boolean nextMatchs(int direction, Point cloc){
-		int cur = currentFruits[cloc.x][cloc.y];
+		int cur = currentChoices[cloc.x][cloc.y];
 		try {
 			switch(direction){
-			case 1: return currentFruits[cloc.x][cloc.y-1] == cur; 
-			case 2: return currentFruits[cloc.x+1][cloc.y] == cur;
-			case 3: return currentFruits[cloc.x][cloc.y+1] == cur;
-			case 4: return currentFruits[cloc.x-1][cloc.y] == cur;
+			case 1: return currentChoices[cloc.x][cloc.y-1] == cur; 
+			case 2: return currentChoices[cloc.x+1][cloc.y] == cur;
+			case 3: return currentChoices[cloc.x][cloc.y+1] == cur;
+			case 4: return currentChoices[cloc.x-1][cloc.y] == cur;
 			default: return false;
 			}
 		} catch (ArrayIndexOutOfBoundsException e){
@@ -183,79 +218,44 @@ public class Grid {
 		}
 		return null;
 	}
+
 	
-	private int pointToFruitInd(FlxPoint p){
-		for ( int i = 0; i < fruits.members.size; i++ ){
-			Fruit f = (Fruit) fruits.members.get(i);
-			if ( f.x == p.x && f.y == p.y )
-				return i;
-		}
-		return -1;
-	}
-	
-	public void rotateFruits(FlxPoint spinPos){
-		/* find the fruits and set there state to rotate		
-		 * 
-		 * A B
-		 * D C
-		 * 
-		 * A RIGHT
-		 * B DOWN
-		 * C LEFT
-		 * D UP
-		 * 
-		 */
+	public void rotateFruits(){
 		
-		Fruit fa = (Fruit)fruits.members.get(pointToFruitInd(spinPos));
+		Point ref = Rg.spinner.collidePos;
+		
+		Fruit fa = currentFruits[ref.x][ref.y];
 		fa.setRotateDirection(Fruit.ROTATE_RIGHT);
 		fa.setCurrentState(Fruit.STATE_ROTATE);
 		fa.startPathing();
 		
-		spinPos.x += Fruit.SIZE_X;
-		Fruit fb = (Fruit)fruits.members.get(pointToFruitInd(spinPos));
+		Fruit fb = currentFruits[ref.x+1][ref.y];
 		fb.setRotateDirection(Fruit.ROTATE_DOWN);
 		fb.setCurrentState(Fruit.STATE_ROTATE);
 		fb.startPathing();
 		
-		spinPos.y += Fruit.SIZE_Y;
-		Fruit fc = (Fruit)fruits.members.get(pointToFruitInd(spinPos));
+		Fruit fc = currentFruits[ref.x+1][ref.y+1];
 		fc.setRotateDirection(Fruit.ROTATE_LEFT);
 		fc.setCurrentState(Fruit.STATE_ROTATE);
 		fc.startPathing();
 		
-		spinPos.x -= Fruit.SIZE_X;
-		Fruit fd = (Fruit)fruits.members.get(pointToFruitInd(spinPos));
+		Fruit fd = currentFruits[ref.x][ref.y+1];
 		fd.setRotateDirection(Fruit.ROTATE_UP);
 		fd.setCurrentState(Fruit.STATE_ROTATE);
 		fd.startPathing();
-		
-		//replace collide indexes
-//		Point ref = Rg.spinner.getCollidePos();
-//		
-//		int[] tempVals = new int[4];
-//		tempVals[0] = currentFruits[ref.x][ref.y];
-//		tempVals[1] = currentFruits[ref.x+1][ref.y];
-//		tempVals[2] = currentFruits[ref.x+1][ref.y+1];
-//		tempVals[3] = currentFruits[ref.x][ref.y+1];
-//		
-//		currentFruits[ref.x][ref.y] = tempVals[1];
-//		currentFruits[ref.x][ref.y] = tempVals[2];
-//		currentFruits[ref.x][ref.y] = tempVals[3];
-//		currentFruits[ref.x][ref.y] = tempVals[0];		
-		
 	}
 	
 	public FlxPoint checkOverlap(FlxPoint mpos) {
-			double shortestDist = 999999999;
-			FlxPoint alignPoint = new FlxPoint(0,0);
-			for ( int i = 0; i < gPoints.size(); i++){
-				double distance = Math.abs(Math.sqrt( Math.pow((mpos.x - gPoints.get(i).x),2) + Math.pow((mpos.y - gPoints.get(i).y),2)));
-				if ( distance < shortestDist ){
-					shortestDist = distance;
-					alignPoint = gPoints.get(i);
-				}
+		double shortestDist = 999999999;
+		FlxPoint alignPoint = new FlxPoint(0,0);
+		for ( int i = 0; i < gPoints.size(); i++){
+			double distance = Math.abs(Math.sqrt( Math.pow((mpos.x - gPoints.get(i).x),2) + Math.pow((mpos.y - gPoints.get(i).y),2)));
+			if ( distance < shortestDist ){
+				shortestDist = distance;
+				alignPoint = gPoints.get(i);
 			}
-			return alignPoint;
+		}
+		return alignPoint;
 	}
 	
 }

@@ -58,11 +58,11 @@ public class PlayState extends FlxState
 		
 		if ( fingers_down == 1 ){
 			FlxPoint toMoveToPos = g.checkOverlap(mpos);
-			if ( toMoveToPos != null){
+			if ( toMoveToPos != null ){
 				boolean canRotate = Rg.spinner.move(toMoveToPos);
 				if (canRotate){
 					FlxG.log("let's rotate");
-					g.rotateFruits(Rg.spinner.getScreenXY());
+					g.rotateFruits();
 				}
 			}
 			justTapped = false;
