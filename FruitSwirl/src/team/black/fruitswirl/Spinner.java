@@ -1,11 +1,9 @@
 package team.black.fruitswirl;
 
-import java.awt.Point;
 import org.flixel.FlxPoint;
 import org.flixel.FlxSprite;
 
 public class Spinner extends FlxSprite {
-
 	private boolean justMoved = false;
 	private FlxPoint initPos = new FlxPoint();
 	private Point initCollidePos = new Point(0, Grid.FRUITS_PER_COL);

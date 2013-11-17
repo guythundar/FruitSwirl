@@ -1,9 +1,7 @@
 package team.black.fruitswirl;
 
 
-import java.awt.Point;
 import java.util.ArrayList;
-
 import org.flixel.*;
 
 public class Grid {
