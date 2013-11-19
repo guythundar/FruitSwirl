@@ -26,7 +26,7 @@ public class PlayState extends FlxState
 		
 		g = new Grid();
 		g.makeFirstBoard();
-		g.initGPoints();
+		g.initGravityPoints();
 		
 		Rg.spinner.alignToGridMember(g.getFirstVisible());
 		
@@ -57,12 +57,14 @@ public class PlayState extends FlxState
 		}
 		
 		if ( fingers_down == 1 ){
-			FlxPoint toMoveToPos = g.checkOverlap(mpos);
-			if ( toMoveToPos != null ){
-				boolean canRotate = Rg.spinner.move(toMoveToPos);
+			FlxPoint moveHere = g.checkOverlap(mpos);
+			if ( moveHere != null ){
+				boolean canRotate = Rg.spinner.move(moveHere, 
+						                            g.getCollidePos(moveHere));
 				if (canRotate){
-					FlxG.log("let's rotate");
+					FlxG.log("Playstate", "--- Start Rotate ---");
 					g.rotateFruits();
+					FlxG.log("Playstate", "--- End Rotate ---");
 				}
 			}
 			justTapped = false;

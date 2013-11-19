@@ -18,4 +18,11 @@ public class Point {
 		x = p.x;
 		y = p.y;
 	}
+	
+	public boolean setXY(int _x, int _y){
+		x = _x;
+		y = _y;
+		
+		return true;
+	}
 }

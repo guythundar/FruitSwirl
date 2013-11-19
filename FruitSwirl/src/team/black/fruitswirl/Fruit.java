@@ -32,6 +32,7 @@ public class Fruit extends FlxSprite {
 	
 	public long UID;
 	
+	private int pathTick = 0;
 	private int currentState;
 	private int rotateDirection;
 	private boolean hasStartedPathing = false;
@@ -61,39 +62,26 @@ public class Fruit extends FlxSprite {
 		
 		
 		if ( currentState == STATE_ROTATE ){
-			FlxG.log("i feel like rotating");
+			pathTick++;
+			FlxG.log( String.valueOf(UID), "i feel like rotating");
+			FlxG.log( String.valueOf(UID), "PathTick: " + pathTick);
 			if ( pathSpeed == 0 ){
+				FlxG.log( String.valueOf(UID), "I'm done rotating, did I move?");
+				FlxG.log( String.valueOf(UID), "Total PathTicks Taken: " + pathTick);
 				stopFollowingPath(true);
 				velocity.x = velocity.y = 0;
 				setCurrentState(STATE_NORMAL);
 				setRotateDirection(ROTATE_NONE);
+				pathTick = 0;
 			}
 		}
 		
 	}
-
-	private int mx = (SIZE_X / 2),
-			    my = (SIZE_Y / 2);
 	
-	public void startPathing(){
+	public void startPathing(FlxPoint endPoint){
 		if ( !hasStartedPathing && currentState == STATE_ROTATE && rotateDirection != ROTATE_NONE){
 			FlxPath path = new FlxPath();
-			switch(rotateDirection){
-				case ROTATE_DOWN:
-					path.add(x+mx, y+my+SIZE_Y);
-				break;
-				case ROTATE_UP:
-					path.add(x+mx, y-SIZE_Y+my);
-				break;
-				case ROTATE_RIGHT:
-					path.add(x+mx +SIZE_X, y+my);
-				break;
-				case ROTATE_LEFT:
-					path.add(x-SIZE_X+mx, y+my);
-				break;
-				default:break;
-			}
-			
+			path.addPoint(endPoint);
 			followPath(path, 50);
 			hasStartedPathing = true;
 		}

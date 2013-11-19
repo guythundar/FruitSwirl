@@ -1,6 +1,5 @@
 package team.black.fruitswirl;
 
-
 import java.util.ArrayList;
 import org.flixel.*;
 
@@ -21,7 +20,17 @@ public class Grid {
 	/**
 	 * currentFruits
 	 */
-	public Fruit[][] currentFruits = new Fruit[FRUITS_PER_ROW][FRUITS_PER_COL*2];
+	public Fruit[][] currentFruits = 
+			new Fruit[FRUITS_PER_ROW][FRUITS_PER_COL*2];
+	
+	
+	
+	/**
+	 * A collection of drawable points that snap to the grid based on minPoint.
+	 * 
+	 */
+	public FlxPoint[][] gridPoints = 
+			new FlxPoint[FRUITS_PER_ROW][FRUITS_PER_COL*2];
 	
 	
 	/**
@@ -33,14 +42,14 @@ public class Grid {
 	public int[][] currentChoices = new int[FRUITS_PER_ROW][FRUITS_PER_COL*2];
 	
 	/**
-	 * gPoints is a set of FlxPoints that are used to check where the player has
-	 * clicked/tapped relative to the Grid. All gPoints are positioned to be in
+	 * gravityPoints is a set of FlxPoints that are used to check where the player has
+	 * clicked/tapped relative to the Grid. All gravityPoints are positioned to be in
 	 * the center of 4 Fruits on the visible grid.
 	 * 
-	 * To init the gPoints, call initGPoints();
+	 * To init the gravityPoints, call initGPoints();
 	 *  
 	 */
-	public ArrayList<FlxPoint> gPoints = new ArrayList<FlxPoint>();
+	public ArrayList<FlxPoint> gravityPoints = new ArrayList<FlxPoint>();
 	
 	/**
 	 * minPoint and maxPoint are the respective start and end point at which
@@ -61,12 +70,21 @@ public class Grid {
 		//calculate the max point for visible fruits to appear
 		maxPoint.x = minPoint.x + ( (FRUITS_PER_ROW-1) * Fruit.SIZE_X);
 		maxPoint.y = minPoint.y + ( (FRUITS_PER_COL-1) * Fruit.SIZE_Y);
+		
+		//build the gridPoints
+		for ( int i = 0; i < FRUITS_PER_ROW; i++){
+			for ( int j = 0; j < FRUITS_PER_COL*2; j++){
+				float x = minPoint.x + ( i * Fruit.SIZE_X ),
+					  y = minPoint.y + ( ( j - FRUITS_PER_COL ) * Fruit.SIZE_Y);
+				gridPoints[i][j] = new FlxPoint(x,y);
+			}
+		}
 	}
 	
-	public void initGPoints(){
+	public void initGravityPoints(){
 		for ( int i = 0; i < FRUITS_PER_ROW-1; i++){
 			for ( int j = 0; j < FRUITS_PER_COL-1; j++ ){				
-				gPoints.add(new FlxPoint(minPoint.x + (i * Fruit.SIZE_X),
+				gravityPoints.add(new FlxPoint(minPoint.x + (i * Fruit.SIZE_X),
 						                 minPoint.y + (j * Fruit.SIZE_Y)));
 			}
 		}
@@ -97,12 +115,10 @@ public class Grid {
 	
 	
 	private void getFirstChoices(){
-		fruits.clear();
 		clearChoices();
 		
 		int choice = -1;
 		boolean ok = false;
-		
 		
 		for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
 			for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){				
@@ -167,8 +183,8 @@ public class Grid {
 	
 	public void updateDrawables(){
 		fruits.clear();
-		for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
-			for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){
+		for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){
+			for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
 				fruits.add(currentFruits[i][j]);
 			}
 		}
@@ -220,40 +236,61 @@ public class Grid {
 	
 	public void rotateFruits(){
 		
+		//get the current location of the Spinner in Collide Points
 		Point ref = Rg.spinner.collidePos;
 		
+		//signal the drawables to start animating
 		Fruit fa = currentFruits[ref.x][ref.y];
 		fa.setRotateDirection(Fruit.ROTATE_RIGHT);
 		fa.setCurrentState(Fruit.STATE_ROTATE);
-		fa.startPathing();
+		fa.startPathing(gridPoints[ref.x+1][ref.y]);
 		
 		Fruit fb = currentFruits[ref.x+1][ref.y];
 		fb.setRotateDirection(Fruit.ROTATE_DOWN);
 		fb.setCurrentState(Fruit.STATE_ROTATE);
-		fb.startPathing();
+		fb.startPathing(gridPoints[ref.x+1][ref.y+1]);
 		
 		Fruit fc = currentFruits[ref.x+1][ref.y+1];
 		fc.setRotateDirection(Fruit.ROTATE_LEFT);
 		fc.setCurrentState(Fruit.STATE_ROTATE);
-		fc.startPathing();
+		fc.startPathing(gridPoints[ref.x][ref.y+1]);
 		
 		Fruit fd = currentFruits[ref.x][ref.y+1];
 		fd.setRotateDirection(Fruit.ROTATE_UP);
 		fd.setCurrentState(Fruit.STATE_ROTATE);
-		fd.startPathing();
+		fd.startPathing(gridPoints[ref.x][ref.y]);
+		
+		//correct the positions of objects in currentFruits
+		currentFruits[ref.x][ref.y] = fb;
+		currentFruits[ref.x+1][ref.y+1] = fc;
+		currentFruits[ref.x+1][ref.y+1] = fd;
+		currentFruits[ref.x][ref.y+1] = fa;
+		
+		//hard fix the drawables to ensure correct alignment
+		//choicesToFruits(); //TODO: May not be needed
 	}
 	
 	public FlxPoint checkOverlap(FlxPoint mpos) {
 		double shortestDist = 999999999;
 		FlxPoint alignPoint = new FlxPoint(0,0);
-		for ( int i = 0; i < gPoints.size(); i++){
-			double distance = Math.abs(Math.sqrt( Math.pow((mpos.x - gPoints.get(i).x),2) + Math.pow((mpos.y - gPoints.get(i).y),2)));
+		for ( int i = 0; i < gravityPoints.size(); i++){
+			double distance = Math.abs(Math.sqrt( Math.pow((mpos.x - gravityPoints.get(i).x),2) + Math.pow((mpos.y - gravityPoints.get(i).y),2)));
 			if ( distance < shortestDist ){
 				shortestDist = distance;
-				alignPoint = gPoints.get(i);
+				alignPoint = gravityPoints.get(i);
 			}
 		}
 		return alignPoint;
+	}
+
+	public Point getCollidePos(FlxPoint moveHere) {
+		Point p = new Point();
+		for ( int i = 0; i < FRUITS_PER_ROW; i++){
+			for ( int j = 0; j < FRUITS_PER_COL*2; j++){
+				if ( moveHere == gridPoints[i][j] && p.setXY(i, j) ) break;
+			}
+		}		
+		return p;
 	}
 	
 }
