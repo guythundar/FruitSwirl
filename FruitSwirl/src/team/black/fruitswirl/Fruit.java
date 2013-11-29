@@ -37,6 +37,7 @@ public class Fruit extends FlxSprite {
 	private int rotateDirection;
 	private boolean hasStartedPathing = false;
 	
+	
 	public Fruit(float _ix, float _iy){
 		super(_ix, _iy);
 		setCurrentState(STATE_NORMAL);
@@ -52,6 +53,8 @@ public class Fruit extends FlxSprite {
 		UID = Rg.rng.nextLong();
 	}
 	
+	
+
 	public void makeTestSprite(int color){
 		makeGraphic(SIZE_X, SIZE_Y, color);
 	}

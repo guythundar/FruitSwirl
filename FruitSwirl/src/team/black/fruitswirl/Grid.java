@@ -1,7 +1,12 @@
 package team.black.fruitswirl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.flixel.*;
+
+import com.badlogic.gdx.utils.Logger;
 
 public class Grid {
 
@@ -132,15 +137,15 @@ public class Grid {
 					else{
 						//this is going to be ugly, its needs to be handled better somehow
 						//horizontal cases
-						if ( ((i - 1 > -1 && choice == currentChoices[i-1][i]) && (i + 1 < FRUITS_PER_ROW && choice == currentChoices[i+1][i])) ||
-							 ((i - 1 > -1 && choice == currentChoices[i-1][i]) && (i - 2 > -1 && choice == currentChoices[i-2][i])) ||
-							 ((i + 1 < FRUITS_PER_ROW && choice == currentChoices[i+1][i]) && (i + 2 < FRUITS_PER_ROW && choice == currentChoices[i+2][i]))
+						if ( ((i - 1 > -1 && choice == currentChoices[i-1][j]) && (i + 1 < FRUITS_PER_ROW && choice == currentChoices[i+1][j])) ||
+							 ((i - 1 > -1 && choice == currentChoices[i-1][j]) && (i - 2 > -1 && choice == currentChoices[i-2][j])) ||
+							 ((i + 1 < FRUITS_PER_ROW && choice == currentChoices[i+1][j]) && (i + 2 < FRUITS_PER_ROW && choice == currentChoices[i+2][j]))
 							)
 							continue;
 						//vertical cases
-						else if( ((i - 1 > -1 && choice == currentChoices[i][i-1]) && (i + 1 < FRUITS_PER_COL*2 && choice == currentChoices[i][i+1])) ||
-								 ((i - 1 > -1 && choice == currentChoices[i][i-1]) && (i - 2 > -1 && choice == currentChoices[i][i-2])) ||
-								 ((i + 1 < FRUITS_PER_COL*2 && choice == currentChoices[i][i+1]) && (i + 2 < FRUITS_PER_COL*2 && choice == currentChoices[i][i+2]))
+						else if( ((j - 1 > -1 && choice == currentChoices[i][j-1]) && (j + 1 < FRUITS_PER_COL*2 && choice == currentChoices[i][j+1])) ||
+								 ((j - 1 > -1 && choice == currentChoices[i][j-1]) && (j - 2 > -1 && choice == currentChoices[i][j-2])) ||
+								 ((j + 1 < FRUITS_PER_COL*2 && choice == currentChoices[i][j+1]) && (j + 2 < FRUITS_PER_COL*2 && choice == currentChoices[i][j+2]))
 								)
 							continue;
 						else ok = true;
@@ -183,48 +188,15 @@ public class Grid {
 	
 	public void updateDrawables(){
 		fruits.clear();
-		for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){
-			for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
+		for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
+			for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){
 				fruits.add(currentFruits[i][j]);
 			}
 		}
 	}
 	
 	
-	/*
-	 *        1
-	 *       /|\
-	 *   4 <--+--> 2
-	 *       \|/
-	 *        3
-	 * 
-	 */
-	private boolean nextMatchs(int direction, Point cloc){
-		int cur = currentChoices[cloc.x][cloc.y];
-		try {
-			switch(direction){
-			case 1: return currentChoices[cloc.x][cloc.y-1] == cur; 
-			case 2: return currentChoices[cloc.x+1][cloc.y] == cur;
-			case 3: return currentChoices[cloc.x][cloc.y+1] == cur;
-			case 4: return currentChoices[cloc.x-1][cloc.y] == cur;
-			default: return false;
-			}
-		} catch (ArrayIndexOutOfBoundsException e){
-			return false;
-		}
-	}
 	
-	//y * w + x
-	public void checkBoard(){
-		for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
-			for ( int j = FRUITS_PER_COL; j < FRUITS_PER_COL * 2; j++ ){
-				if ( nextMatchs(1, new Point(i,j)) && nextMatchs(1, new Point(i,j-1)) ){
-					
-				}
-			}
-		}
-	}
-
 	public Fruit getFirstVisible() {
 		for ( int i = 0; i < fruits.length; i++){
 			if ( fruits.members.get(i).visible )
@@ -239,11 +211,15 @@ public class Grid {
 		//get the current location of the Spinner in Collide Points
 		Point ref = Rg.spinner.collidePos;
 		
+		long auid;
+		
 		//signal the drawables to start animating
 		Fruit fa = currentFruits[ref.x][ref.y];
 		fa.setRotateDirection(Fruit.ROTATE_RIGHT);
 		fa.setCurrentState(Fruit.STATE_ROTATE);
 		fa.startPathing(gridPoints[ref.x+1][ref.y]);
+		
+		auid = fa.UID;
 		
 		Fruit fb = currentFruits[ref.x+1][ref.y];
 		fb.setRotateDirection(Fruit.ROTATE_DOWN);
@@ -253,6 +229,7 @@ public class Grid {
 		Fruit fc = currentFruits[ref.x+1][ref.y+1];
 		fc.setRotateDirection(Fruit.ROTATE_LEFT);
 		fc.setCurrentState(Fruit.STATE_ROTATE);
+		
 		fc.startPathing(gridPoints[ref.x][ref.y+1]);
 		
 		Fruit fd = currentFruits[ref.x][ref.y+1];
@@ -260,14 +237,20 @@ public class Grid {
 		fd.setCurrentState(Fruit.STATE_ROTATE);
 		fd.startPathing(gridPoints[ref.x][ref.y]);
 		
-		//correct the positions of objects in currentFruits
-		currentFruits[ref.x][ref.y] = fb;
-		currentFruits[ref.x+1][ref.y+1] = fc;
-		currentFruits[ref.x+1][ref.y+1] = fd;
-		currentFruits[ref.x][ref.y+1] = fa;
+		//y * w + x
+		ArrayList<Fruit> f = (ArrayList<Fruit>) Rg.twoDArrayToList(currentFruits);
+		Collections.swap(f, (ref.y * FRUITS_PER_ROW + ref.x), ((ref.y+1) * FRUITS_PER_ROW + ref.x));
+		Collections.swap(f, (ref.y * FRUITS_PER_ROW + (ref.x+1)), (ref.y * FRUITS_PER_ROW + ref.x));
+		Collections.swap(f, ((ref.y+1) * FRUITS_PER_ROW + ref.x), (ref.y * FRUITS_PER_ROW + (ref.x+1)));
+		Collections.swap(f, ((ref.y+1) * FRUITS_PER_ROW + (ref.x+1)), (ref.y+1) * FRUITS_PER_ROW + ref.x);
 		
-		//hard fix the drawables to ensure correct alignment
-		//choicesToFruits(); //TODO: May not be needed
+		for ( int i = 0; i < f.size(); i++){
+			int y = (int) Math.floor(i/FRUITS_PER_ROW), x = i % FRUITS_PER_ROW;
+			currentFruits[x][y] = f.get(i);
+		}
+		
+		if ( auid == currentFruits[ref.x][ref.y].UID )
+			FlxG.log("[!!!] Rotation didn't move UID properly.");
 	}
 	
 	public FlxPoint checkOverlap(FlxPoint mpos) {
