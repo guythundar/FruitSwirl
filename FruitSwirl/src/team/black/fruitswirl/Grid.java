@@ -38,6 +38,8 @@ public class Grid {
 			new FlxPoint[FRUITS_PER_ROW][FRUITS_PER_COL*2];
 	
 	
+	public FlxSprite bg;
+	
 	/**
 	 * currentChoices contains a int that identifies the type of Fruit that
 	 * is in the grid. It does not contain any reference to the Fruit itself or
@@ -84,6 +86,10 @@ public class Grid {
 				gridPoints[i][j] = new FlxPoint(x,y);
 			}
 		}
+		
+		//load bgGraphic
+		bg = new FlxSprite(minPoint.x - 3, minPoint.y -2);
+		bg.loadGraphic("retina_wood_bg.png");
 	}
 	
 	public void initGravityPoints(){

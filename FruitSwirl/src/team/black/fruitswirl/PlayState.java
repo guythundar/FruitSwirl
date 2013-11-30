@@ -22,7 +22,7 @@ public class PlayState extends FlxState
 		bg = new FlxSprite(0,0);
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFF000000);
 		
-		t = new FlxText(0, 0, 600, "FruitSwirl Demo -- Version Pre-Alpha");
+		t = new FlxText(0, 0, 600, "FruitSwirl Alpha");
 		
 		g = new Grid();
 		g.makeFirstBoard();
@@ -33,6 +33,7 @@ public class PlayState extends FlxState
 		//render
 		add(bg);
 		add(t);
+		add(g.bg);
 		add(Rg.spinner);
 		add(g.fruits);
 		
