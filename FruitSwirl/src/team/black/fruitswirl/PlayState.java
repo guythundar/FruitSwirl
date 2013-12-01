@@ -6,14 +6,15 @@ import org.flixel.FlxSprite;
 import org.flixel.FlxState;
 import org.flixel.FlxText;
 
+import com.badlogic.gdx.graphics.Color;
+
 public class PlayState extends FlxState
 {
 	private Grid g;
 	private FlxSprite bg;
-	private FlxText t;
+	private FlxText t, scoreText, spinText;
 	private boolean justTapped = false;
 	private FlxPoint mpos = new FlxPoint(0,0);
-	
 	
 	@Override
 	public void create()
@@ -28,15 +29,27 @@ public class PlayState extends FlxState
 		g.makeFirstBoard();
 		g.initGravityPoints();
 		
+		scoreText = new FlxText(g.minPoint.x, g.maxPoint.y + Fruit.SIZE_Y + 3, 200, "Score: 0");
+		spinText = new FlxText(g.maxPoint.x, g.maxPoint.y + Fruit.SIZE_Y, 200, "Spins: 0");
+		
+		
 		Rg.spinner.alignToGridMember(g.getFirstVisible());
 		
 		//render
 		add(bg);
 		add(t);
+		add(scoreText);
+		add(spinText);
 		add(g.bg);
 		add(Rg.spinner);
 		add(g.fruits);
 		
+		for (int i = 0; i < g.gravityPoints.size(); i++){
+			FlxSprite s = new FlxSprite(g.gravityPoints.get(i).x,
+										g.gravityPoints.get(i).y);
+			s.makeGraphic(2, 2, Color.GRAY.toIntBits());
+			add(s);
+		}
 		
 		
 	}
@@ -60,12 +73,13 @@ public class PlayState extends FlxState
 		if ( fingers_down == 1 ){
 			FlxPoint moveHere = g.checkOverlap(mpos);
 			if ( moveHere != null ){
-				boolean canRotate = Rg.spinner.move(moveHere, 
-						                            g.getCollidePos(moveHere));
-				if (canRotate){
-					FlxG.log("Playstate", "--- Start Rotate ---");
+				boolean moved = Rg.spinner.move(moveHere, 
+						                    g.getCollidePosFromPoint(moveHere));
+				if (!moved){
 					g.rotateFruits();
-					FlxG.log("Playstate", "--- End Rotate ---");
+					Rg.curRotations++;
+					spinText.setText("Spins: " + Rg.curRotations);
+					g.updateDrawables();
 				}
 			}
 			justTapped = false;

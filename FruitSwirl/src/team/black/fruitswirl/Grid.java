@@ -66,7 +66,7 @@ public class Grid {
 	 * respect to minPoint.
 	 *
 	 */
-	private FlxPoint minPoint = new FlxPoint(),
+	public FlxPoint minPoint = new FlxPoint(),
 			         maxPoint = new FlxPoint();
 	
 	public Grid(){
@@ -115,15 +115,16 @@ public class Grid {
 		getFirstChoices();
 		choicesToFruits();
 		updateDrawables();
-		
-		//hide the off screen members
+		setOffscreenVisible(false);
+	}
+	
+	public void setOffscreenVisible(boolean b){
 		for ( int i = 0; i < fruits.length; i++){
 			Fruit f = (Fruit) fruits.members.get(i);
 			if (f.y < minPoint.y)
-				f.visible = false;
+				f.visible = b;
 		}
 	}
-	
 	
 	private void getFirstChoices(){
 		clearChoices();
@@ -196,7 +197,10 @@ public class Grid {
 		fruits.clear();
 		for ( int i = 0; i < FRUITS_PER_ROW; i++ ){
 			for ( int j = 0; j < FRUITS_PER_COL*2; j++ ){
-				fruits.add(currentFruits[i][j]);
+				Fruit f = currentFruits[i][j];
+				f.x = gridPoints[i][j].x;
+				f.y = gridPoints[i][j].y;
+				fruits.add(f);
 			}
 		}
 	}
@@ -215,55 +219,44 @@ public class Grid {
 	public void rotateFruits(){
 		
 		//get the current location of the Spinner in Collide Points
-		Point ref = Rg.spinner.collidePos;
-		
-		long auid;
+		Point ref = Rg.spinner.getCollidePos();
 		
 		//signal the drawables to start animating
-		Fruit fa = currentFruits[ref.x][ref.y];
-		fa.setRotateDirection(Fruit.ROTATE_RIGHT);
-		fa.setCurrentState(Fruit.STATE_ROTATE);
-		fa.startPathing(gridPoints[ref.x+1][ref.y]);
+		FlxPoint p = new FlxPoint(currentFruits[ref.x+1][ref.y].x,
+									currentFruits[ref.x+1][ref.y].y );
+		currentFruits[ref.x][ref.y].startPathing(p, Fruit.MOVE_RIGHT);
 		
-		auid = fa.UID;
+		p = new FlxPoint(currentFruits[ref.x+1][ref.y+1].x,
+				currentFruits[ref.x+1][ref.y+1].y );
+		currentFruits[ref.x+1][ref.y].startPathing(p,Fruit.MOVE_DOWN);
+
+		p = new FlxPoint(currentFruits[ref.x][ref.y+1].x,
+				currentFruits[ref.x][ref.y+1].y );
+		currentFruits[ref.x+1][ref.y+1].startPathing(p, Fruit.MOVE_LEFT);
+
+		p = new FlxPoint(currentFruits[ref.x][ref.y].x,
+				currentFruits[ref.x][ref.y].y );
+		currentFruits[ref.x][ref.y+1].startPathing(p, Fruit.MOVE_UP);
 		
-		Fruit fb = currentFruits[ref.x+1][ref.y];
-		fb.setRotateDirection(Fruit.ROTATE_DOWN);
-		fb.setCurrentState(Fruit.STATE_ROTATE);
-		fb.startPathing(gridPoints[ref.x+1][ref.y+1]);
-		
-		Fruit fc = currentFruits[ref.x+1][ref.y+1];
-		fc.setRotateDirection(Fruit.ROTATE_LEFT);
-		fc.setCurrentState(Fruit.STATE_ROTATE);
-		
-		fc.startPathing(gridPoints[ref.x][ref.y+1]);
-		
-		Fruit fd = currentFruits[ref.x][ref.y+1];
-		fd.setRotateDirection(Fruit.ROTATE_UP);
-		fd.setCurrentState(Fruit.STATE_ROTATE);
-		fd.startPathing(gridPoints[ref.x][ref.y]);
-		
-		//y * w + x
-		ArrayList<Fruit> f = (ArrayList<Fruit>) Rg.twoDArrayToList(currentFruits);
-		Collections.swap(f, (ref.y * FRUITS_PER_ROW + ref.x), ((ref.y+1) * FRUITS_PER_ROW + ref.x));
-		Collections.swap(f, (ref.y * FRUITS_PER_ROW + (ref.x+1)), (ref.y * FRUITS_PER_ROW + ref.x));
-		Collections.swap(f, ((ref.y+1) * FRUITS_PER_ROW + ref.x), (ref.y * FRUITS_PER_ROW + (ref.x+1)));
-		Collections.swap(f, ((ref.y+1) * FRUITS_PER_ROW + (ref.x+1)), (ref.y+1) * FRUITS_PER_ROW + ref.x);
-		
-		for ( int i = 0; i < f.size(); i++){
-			int y = (int) Math.floor(i/FRUITS_PER_ROW), x = i % FRUITS_PER_ROW;
-			currentFruits[x][y] = f.get(i);
-		}
-		
-		if ( auid == currentFruits[ref.x][ref.y].UID )
-			FlxG.log("[!!!] Rotation didn't move UID properly.");
+		swapFruits(ref.x, ref.y, ref.x+1, ref.y);
+		swapFruits(ref.x, ref.y, ref.x+1, ref.y+1);
+		swapFruits(ref.x, ref.y, ref.x, ref.y+1);
+	}
+	
+	private void swapFruits(int ox, int oy, int nx, int ny){
+		Fruit t = currentFruits[ox][oy];
+		currentFruits[ox][oy] = currentFruits[nx][ny];
+		currentFruits[nx][ny] = t;		
 	}
 	
 	public FlxPoint checkOverlap(FlxPoint mpos) {
-		double shortestDist = 999999999;
-		FlxPoint alignPoint = new FlxPoint(0,0);
+		double shortestDist = Double.MAX_VALUE;
+		FlxPoint alignPoint = new FlxPoint();
 		for ( int i = 0; i < gravityPoints.size(); i++){
-			double distance = Math.abs(Math.sqrt( Math.pow((mpos.x - gravityPoints.get(i).x),2) + Math.pow((mpos.y - gravityPoints.get(i).y),2)));
+			double distance = Math.abs(Math.sqrt(Math.pow((mpos.x - 
+										gravityPoints.get(i).x),2) +
+										Math.pow((mpos.y-gravityPoints.get(i).y)
+										,2)));
 			if ( distance < shortestDist ){
 				shortestDist = distance;
 				alignPoint = gravityPoints.get(i);
@@ -272,11 +265,15 @@ public class Grid {
 		return alignPoint;
 	}
 
-	public Point getCollidePos(FlxPoint moveHere) {
+	public Point getCollidePosFromPoint(FlxPoint moveHere) {
 		Point p = new Point();
 		for ( int i = 0; i < FRUITS_PER_ROW; i++){
 			for ( int j = 0; j < FRUITS_PER_COL*2; j++){
-				if ( moveHere == gridPoints[i][j] && p.setXY(i, j) ) break;
+				if ( moveHere.x == gridPoints[i][j].x &&
+					 moveHere.y == gridPoints[i][j].y){
+					p.setXY(i, j);
+					break;
+				}
 			}
 		}		
 		return p;

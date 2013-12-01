@@ -23,6 +23,6 @@ public class Point {
 		x = _x;
 		y = _y;
 		
-		return true;
+		return (_x == x && _y == y);
 	}
 }

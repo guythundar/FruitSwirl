@@ -1,13 +1,16 @@
 package team.black.fruitswirl;
 
+import org.flixel.FlxG;
 import org.flixel.FlxPoint;
 import org.flixel.FlxSprite;
 
 public class Spinner extends FlxSprite {
-	private boolean justMoved = false;
+	private boolean justMoved = false, flickerDown = true;
+	private double flickerCount = 0;
 	private FlxPoint initPos = new FlxPoint();
-	private Point initCollidePos = new Point(0, Grid.FRUITS_PER_COL-1);
-	public Point collidePos = new Point();
+	public Point initCollidePos = new Point(),
+				collidePos = new Point();
+	
 	
 	public boolean hasJustMoved() {
 		return justMoved;
@@ -20,30 +23,34 @@ public class Spinner extends FlxSprite {
 	public Spinner(float X, float Y) {
 		super(X, Y);
 		loadGraphic("spinner.png");
-		collidePos = initCollidePos;
 	}
+	
 	
 	@Override
 	public void update(){
-		
+		if ( _alpha >= 1 ){
+			flickerDown = true;
+		} else if ( _alpha <= 0.25 ) {
+			flickerDown = false;
+		}
+		_alpha += (flickerDown)?-.025:.025;
 	}
 
 	public boolean move(FlxPoint dPos, Point cPos){
+		collidePos.setXY(cPos.x, cPos.y);
+		_alpha = 1;
 		if ( x == dPos.x && y == dPos.y )
-			return true;
+			return false;
 		else{			
 			x = dPos.x;
-			y = dPos.y;
-			
-			collidePos = cPos;
-			
-			return false;
+			y = dPos.y;			
+			return true;
 		}
 	}
 
 	
 	public Point getCollidePos(){
-		return new Point((int)collidePos.x, (int)collidePos.y);
+		return collidePos;
 	}
 	
 	public void alignToGridMember(Fruit f) {
