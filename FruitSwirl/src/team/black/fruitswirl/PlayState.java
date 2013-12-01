@@ -16,7 +16,7 @@ public class PlayState extends FlxState
 {
 	private Grid g;
 	private FlxSprite bg;
-	private FlxText t, scoreText, spinText;
+	private FlxText t, scoreText;
 	private boolean justTapped = false;
 	private FlxPoint mpos = new FlxPoint(0,0);
 	
@@ -34,9 +34,7 @@ public class PlayState extends FlxState
 		g.makeFirstBoard();
 		g.initGravityPoints();
 		
-		scoreText = new FlxText(g.minPoint.x, g.maxPoint.y + Fruit.SIZE_Y + 3, 200, "Score: 0");
-		spinText = new FlxText(g.maxPoint.x - 45, g.maxPoint.y + Fruit.SIZE_Y, 200, "Spins: 0");
-		
+		scoreText = new FlxText(g.minPoint.x, g.maxPoint.y + Fruit.SIZE_Y + 3, 200, "Score: 0");		
 		
 		Rg.spinner.alignToGridMember(g.getFirstVisible());
 		
@@ -44,7 +42,6 @@ public class PlayState extends FlxState
 		add(bg);
 		add(t);
 		add(scoreText);
-		add(spinText);
 		add(g.bg);
 		add(Rg.spinner);
 		add(g.fruits);
@@ -83,7 +80,6 @@ public class PlayState extends FlxState
 				if (!moved){
 					g.rotateFruits();
 					Rg.curRotations++;
-					spinText.setText("Spins: " + Rg.curRotations);
 				}
 			}
 			justTapped = false;

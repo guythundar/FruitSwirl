@@ -1,13 +1,10 @@
 package team.black.fruitswirl;
 
-import org.flixel.FlxG;
 import org.flixel.FlxPoint;
 import org.flixel.FlxSprite;
 
 public class Spinner extends FlxSprite {
 	private boolean justMoved = false, flickerDown = true;
-	private double flickerCount = 0;
-	private FlxPoint initPos = new FlxPoint();
 	public Point initCollidePos = new Point(),
 				collidePos = new Point();
 	
@@ -56,6 +53,5 @@ public class Spinner extends FlxSprite {
 	public void alignToGridMember(Fruit f) {
 		x = f.x;
 		y = f.y;
-		initPos = new FlxPoint(x,y);
 	}
 }

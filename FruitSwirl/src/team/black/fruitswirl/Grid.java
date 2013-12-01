@@ -231,25 +231,21 @@ public class Grid {
 									currentFruits[ref.x+1][ref.y].y );
 		Tween.to(currentFruits[ref.x][ref.y], TweenSprite.XY, 1f)
 	     .target(p.x, p.y).start(TweenPlugin.manager);
-		//currentFruits[ref.x][ref.y].startPathing(p, Fruit.MOVE_RIGHT);
 		
 		p = new FlxPoint(currentFruits[ref.x+1][ref.y+1].x,
 				currentFruits[ref.x+1][ref.y+1].y );
 		Tween.to(currentFruits[ref.x+1][ref.y], TweenSprite.XY, 1f)
 		     .target(p.x, p.y).start(TweenPlugin.manager);
-		//currentFruits[ref.x+1][ref.y].startPathing(p,Fruit.MOVE_DOWN);
-
+		
 		p = new FlxPoint(currentFruits[ref.x][ref.y+1].x,
 				currentFruits[ref.x][ref.y+1].y );
 		Tween.to(currentFruits[ref.x+1][ref.y+1], TweenSprite.XY, 1f)
 	     .target(p.x, p.y).start(TweenPlugin.manager);
-		//currentFruits[ref.x+1][ref.y+1].startPathing(p, Fruit.MOVE_LEFT);
-
+		
 		p = new FlxPoint(currentFruits[ref.x][ref.y].x,
 				currentFruits[ref.x][ref.y].y );
 		Tween.to(currentFruits[ref.x][ref.y+1], TweenSprite.XY, 1f)
 	     .target(p.x, p.y).start(TweenPlugin.manager);
-		//currentFruits[ref.x][ref.y+1].startPathing(p, Fruit.MOVE_UP);
 		
 		swapFruits(ref.x, ref.y, ref.x+1, ref.y);
 		swapFruits(ref.x, ref.y, ref.x+1, ref.y+1);
