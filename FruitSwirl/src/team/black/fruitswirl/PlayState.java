@@ -5,6 +5,10 @@ import org.flixel.FlxPoint;
 import org.flixel.FlxSprite;
 import org.flixel.FlxState;
 import org.flixel.FlxText;
+import org.flixel.plugin.tweens.TweenPlugin;
+import org.flixel.plugin.tweens.TweenSprite;
+
+import aurelienribon.tweenengine.Tween;
 
 import com.badlogic.gdx.graphics.Color;
 
@@ -19,6 +23,7 @@ public class PlayState extends FlxState
 	@Override
 	public void create()
 	{
+		
 		//prep
 		bg = new FlxSprite(0,0);
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFF000000);
@@ -30,7 +35,7 @@ public class PlayState extends FlxState
 		g.initGravityPoints();
 		
 		scoreText = new FlxText(g.minPoint.x, g.maxPoint.y + Fruit.SIZE_Y + 3, 200, "Score: 0");
-		spinText = new FlxText(g.maxPoint.x, g.maxPoint.y + Fruit.SIZE_Y, 200, "Spins: 0");
+		spinText = new FlxText(g.maxPoint.x - 45, g.maxPoint.y + Fruit.SIZE_Y, 200, "Spins: 0");
 		
 		
 		Rg.spinner.alignToGridMember(g.getFirstVisible());
@@ -79,7 +84,6 @@ public class PlayState extends FlxState
 					g.rotateFruits();
 					Rg.curRotations++;
 					spinText.setText("Spins: " + Rg.curRotations);
-					g.updateDrawables();
 				}
 			}
 			justTapped = false;

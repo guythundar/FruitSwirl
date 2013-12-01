@@ -1,12 +1,17 @@
 package team.black.fruitswirl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.flixel.*;
+import org.flixel.plugin.tweens.TweenPlugin;
+import org.flixel.plugin.tweens.TweenSprite;
 
-import com.badlogic.gdx.utils.Logger;
+import aurelienribon.tweenengine.Tween;
 
 public class Grid {
 
@@ -224,19 +229,27 @@ public class Grid {
 		//signal the drawables to start animating
 		FlxPoint p = new FlxPoint(currentFruits[ref.x+1][ref.y].x,
 									currentFruits[ref.x+1][ref.y].y );
-		currentFruits[ref.x][ref.y].startPathing(p, Fruit.MOVE_RIGHT);
+		Tween.to(currentFruits[ref.x][ref.y], TweenSprite.XY, 1f)
+	     .target(p.x, p.y).start(TweenPlugin.manager);
+		//currentFruits[ref.x][ref.y].startPathing(p, Fruit.MOVE_RIGHT);
 		
 		p = new FlxPoint(currentFruits[ref.x+1][ref.y+1].x,
 				currentFruits[ref.x+1][ref.y+1].y );
-		currentFruits[ref.x+1][ref.y].startPathing(p,Fruit.MOVE_DOWN);
+		Tween.to(currentFruits[ref.x+1][ref.y], TweenSprite.XY, 1f)
+		     .target(p.x, p.y).start(TweenPlugin.manager);
+		//currentFruits[ref.x+1][ref.y].startPathing(p,Fruit.MOVE_DOWN);
 
 		p = new FlxPoint(currentFruits[ref.x][ref.y+1].x,
 				currentFruits[ref.x][ref.y+1].y );
-		currentFruits[ref.x+1][ref.y+1].startPathing(p, Fruit.MOVE_LEFT);
+		Tween.to(currentFruits[ref.x+1][ref.y+1], TweenSprite.XY, 1f)
+	     .target(p.x, p.y).start(TweenPlugin.manager);
+		//currentFruits[ref.x+1][ref.y+1].startPathing(p, Fruit.MOVE_LEFT);
 
 		p = new FlxPoint(currentFruits[ref.x][ref.y].x,
 				currentFruits[ref.x][ref.y].y );
-		currentFruits[ref.x][ref.y+1].startPathing(p, Fruit.MOVE_UP);
+		Tween.to(currentFruits[ref.x][ref.y+1], TweenSprite.XY, 1f)
+	     .target(p.x, p.y).start(TweenPlugin.manager);
+		//currentFruits[ref.x][ref.y+1].startPathing(p, Fruit.MOVE_UP);
 		
 		swapFruits(ref.x, ref.y, ref.x+1, ref.y);
 		swapFruits(ref.x, ref.y, ref.x+1, ref.y+1);
@@ -277,6 +290,14 @@ public class Grid {
 			}
 		}		
 		return p;
+	}
+	
+	public ArrayList<ArrayList<Point>> findLineups(){
+		ArrayList<ArrayList<Point>> l = new ArrayList<ArrayList<Point>>();
+		
+		
+		
+		return l;	
 	}
 	
 }

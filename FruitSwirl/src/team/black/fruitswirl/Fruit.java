@@ -65,32 +65,7 @@ public class Fruit extends FlxSprite {
 	@Override
 	public void update(){
 		super.update();
-
-		if ( currentState == STATE_MOVING ){
-			pathTick++;
-			FlxG.log( String.valueOf(UID), "PathTick: " + pathTick);
-			if ( pathSpeed == 0 ){
-				stopFollowingPath(true);
-				velocity.x = velocity.y = 0;
-				setCurrentState(STATE_NORMAL);
-				setRotateDirection(MOVE_NONE);
-				pathTick = 0;
-				x = curTarget.x;
-				y = curTarget.y;
-			}
-		}
 		
-	}
-	
-	public void startPathing(FlxPoint endPoint, int direction){
-		if ( !hasStartedPathing ){
-			currentState = STATE_MOVING;
-			FlxPath path = new FlxPath();
-			curTarget = endPoint;
-			path.add(endPoint.x + (SIZE_X/2 - 2), endPoint.y + (SIZE_Y/2 - 2));
-			followPath(path, 100);
-			hasStartedPathing = true;
-		}
 	}
 	
 	public int getCurrentState() {

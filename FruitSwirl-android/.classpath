@@ -11,6 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="/FruitSwirl/libs/flixel-core.jar" sourcepath="/FruitSwirl/libs/flixel-core-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/flixel-android.jar" sourcepath="libs/flixel-android-sources.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry exported="true" kind="lib" path="/FruitSwirl/libs/tween-engine-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="/FruitSwirl/libs/tween-engine-api-sources.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
-
