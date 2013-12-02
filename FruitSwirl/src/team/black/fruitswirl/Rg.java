@@ -12,5 +12,7 @@ public class Rg {
 	public static int curScore = 0;
 	public static int curRotations = 0;
 	public static double scoreMultiplier = 1.0;
-	public static Spinner spinner = new Spinner(0, 0);	
+	public static Spinner spinner = new Spinner(0, 0);
+	public static boolean paused = false;
+	public static int curLevel = 0;
 }

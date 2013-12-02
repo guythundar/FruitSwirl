@@ -3,15 +3,23 @@ package team.black.fruitswirl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.HiddenAction;
 
 import org.flixel.*;
 import org.flixel.plugin.tweens.TweenPlugin;
 import org.flixel.plugin.tweens.TweenSprite;
 
+import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
 
 public class Grid {
 
@@ -245,11 +253,29 @@ public class Grid {
 		p = new FlxPoint(currentFruits[ref.x][ref.y].x,
 				currentFruits[ref.x][ref.y].y );
 		Tween.to(currentFruits[ref.x][ref.y+1], TweenSprite.XY, 1f)
-	     .target(p.x, p.y).start(TweenPlugin.manager);
+	     .target(p.x, p.y).call(afterSpin).start(TweenPlugin.manager);
 		
 		swapFruits(ref.x, ref.y, ref.x+1, ref.y);
 		swapFruits(ref.x, ref.y, ref.x+1, ref.y+1);
 		swapFruits(ref.x, ref.y, ref.x, ref.y+1);
+		
+		swapChoices(ref.x, ref.y, ref.x+1, ref.y);
+		swapChoices(ref.x, ref.y, ref.x+1, ref.y+1);
+		swapChoices(ref.x, ref.y, ref.x, ref.y+1);		
+	}
+	
+	private TweenCallback afterSpin = new TweenCallback() {
+		
+		@Override
+		public void onEvent(int arg0, BaseTween<?> arg1) {
+			updateDrawables();
+		}
+	};
+	
+	private void swapChoices(int ox, int oy, int nx, int ny){
+		int i = currentChoices[ox][oy];
+		currentChoices[ox][oy] = currentChoices[nx][ny];
+		currentChoices[nx][ny] = i;		
 	}
 	
 	private void swapFruits(int ox, int oy, int nx, int ny){
@@ -288,12 +314,118 @@ public class Grid {
 		return p;
 	}
 	
-	public ArrayList<ArrayList<Point>> findLineups(){
-		ArrayList<ArrayList<Point>> l = new ArrayList<ArrayList<Point>>();
+	public Set<Point> findLineups(){
+		Set<Point> t = new HashSet<Point>();
+		int minx = 0,
+			miny = FRUITS_PER_COL,
+			maxx = FRUITS_PER_ROW,
+			maxy = FRUITS_PER_COL * 2;
 		
+		for ( int i = minx; i < maxx; i++ ){
+			for ( int j = miny; j < maxy; j++){
+				int c = currentChoices[i][j];
+				// X-
+				if ( (i-1 > minx && currentChoices[i-1][j] == c ) && 
+					 (i-2 > minx && currentChoices[i-2][j] == c)){
+					t.add(new Point(i,j));
+					t.add(new Point(i-1,j));
+					t.add(new Point(i-2,j));
+					int d = 1;
+					while (i-2-d > minx && currentChoices[i-2-d][j] == c){
+						t.add(new Point(i-2-d,j));
+						d++;
+					} d=0;
+					while (i+d < maxx && currentChoices[i+d][j] == c){
+						t.add(new Point(i+d,j));
+						d++;
+					}
+				} else if ((i+1 < maxx && currentChoices[i+1][j] == c ) && 
+						 (i+2 < maxx && currentChoices[i+2][j] == c)) { // X+
+					t.add(new Point(i,j));
+					t.add(new Point(i+1,j));
+					t.add(new Point(i+2,j));
+					int d = 1;
+					while (i+2+d < maxx && currentChoices[i+2+d][j] == c){
+						t.add(new Point(i+2+d,j));
+						d++;
+					} d=0;
+					while (i-d > minx && currentChoices[i-d][j] == c){
+						t.add(new Point(i-d,j));
+						d++;
+					}
+				} else if ( (j-1 > miny && currentChoices[i][j-1] == c ) && 
+						 (j-2 > miny && currentChoices[i][j-2] == c)){ //Y-
+					t.add(new Point(i,j));
+					t.add(new Point(i,j-1));
+					t.add(new Point(i,j-2));
+					int d = 1;
+					while (j-2-d > miny && currentChoices[i][j-2-d] == c){
+						t.add(new Point(i,j-2-d));
+						d++;
+					} d=0;
+					while (j+d < maxx && currentChoices[i][j+d] == c){
+						t.add(new Point(i,j+d));
+						d++;
+					}
+				} else if ((j+1 < maxy && currentChoices[i][j+1] == c ) && 
+							 (j+2 < maxy && currentChoices[i][j+2] == c)) { //Y+
+					t.add(new Point(i,j));
+					t.add(new Point(i,j+1));
+					t.add(new Point(i,j+2));
+					int d = 1;
+					while (j+2+d < maxy && currentChoices[i][j+2+d] == c){
+						t.add(new Point(i,j+2+d));
+						d++;
+					} d=0;
+					while (j-d > miny && currentChoices[i][j-d] == c){
+						t.add(new Point(i,j-d));
+						d++;
+					}
+				}
+			}
+		}
 		
+		return t;	
+	}
+
+	public void clearLineups(Set<Point> lineups) {
+		ArrayList<Point> l = new ArrayList<Point>();
+		l.addAll(lineups);
+		for ( int i = 0; i < l.size(); i++ ){
+			Point p = l.get(i);
+			Rg.curScore += currentFruits[p.x][p.y].getCurrentPointValue();
+			fruits.remove(currentFruits[p.x][p.y]);
+			currentChoices[p.x][p.y] = -1;
+		}
+	}
+	
+	public void genNewFruits(){
+		//slide down the existing fruits
+		for( int i = 0; i < FRUITS_PER_ROW; i++){
+			for ( int j = 0; j < ( (FRUITS_PER_COL * 2) - 1); j++){
+				if ( currentChoices[i][j+1] == -1 ){
+					FlxPoint p = new FlxPoint(gridPoints[i][j+1].x,
+							gridPoints[i][j+1].y );
+					Tween.to(currentFruits[i][j], TweenSprite.Y, 1f)
+				     .target(p.x, p.y).call(afterSpin).start(TweenPlugin.manager);
+					
+					swapFruits(i, j, i, j+1);
+					swapChoices(i, j, i, j+1);
+				}
+			}
+		}
 		
-		return l;	
+		//make some new choices, then update the currentfruits and drawables
+		for( int i = 0; i < FRUITS_PER_ROW; i++){
+			for ( int j = 0; j < ( (FRUITS_PER_COL * 2) - 1); j++){
+				if ( currentChoices[i][j] == -1 )
+					currentChoices[i][j] = Rg.rng.nextInt(5);
+			}
+		}
+		
+		choicesToFruits();
+		updateDrawables();
+		setOffscreenVisible(false);
 	}
 	
 }
