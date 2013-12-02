@@ -43,7 +43,7 @@ public class PlayState extends FlxState
 		bg = new FlxSprite(0,0);
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFF000000);
 		
-		t = new FlxText(0, 0, 600, "FruitSwirl Alpha 1.1");
+		t = new FlxText(0, 0, 600, Rg.gameTitle);
 		
 		lvlComplete = new FlxSprite();
 		lvlComplete.loadGraphic("lvl_complete.png");
