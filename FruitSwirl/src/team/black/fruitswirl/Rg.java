@@ -9,6 +9,7 @@ import java.util.List;
 public class Rg {
 
 	public static MersenneTwisterFast rng = new MersenneTwisterFast();
+	public static String gameTitle = "FruitSwirl Alpha";
 	public static int curScore = 0;
 	public static int curRotations = 0;
 	public static double scoreMultiplier = 1.0;
