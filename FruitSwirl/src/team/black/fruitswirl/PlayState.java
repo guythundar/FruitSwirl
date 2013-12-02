@@ -35,7 +35,11 @@ public class PlayState extends FlxState
 		//level score thresholds
 		levelThres[0] = 50;
 		for ( int i = 1; i < 10; i++ )
+<<<<<<< HEAD
 			levelThres[i] += levelThres[i-1] + 50 + ( i * 25 );
+=======
+			levelThres[i] += levelThres[i-1] + 50 + ( (i-1) * 25 );
+>>>>>>> alex-testing
 		//try and score this much!
 		levelThres[10] = Integer.MAX_VALUE - Rg.rng.nextInt(9999);
 		
@@ -115,6 +119,7 @@ public class PlayState extends FlxState
 		
 		//update score text
 		scoreText.setText("Score: " + Rg.curScore);
+		lvlText.setText("Level: " + Rg.curLevel);
 		
 		if ( Rg.curScore > levelThres[Rg.curLevel] ){
 			levelUp();
