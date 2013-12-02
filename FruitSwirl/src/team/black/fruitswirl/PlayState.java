@@ -33,9 +33,8 @@ public class PlayState extends FlxState
 	{
 		
 		//level score thresholds
-		levelThres[0] = 1; //temp for testing
-		for ( int i = 1; i < 10; i++ )
-			levelThres[i] += 50 + ( i * 25 );
+		for ( int i = 0; i < 10; i++ )
+			levelThres[i] += 50 + ( i * 75 );
 		//try and score this much!
 		levelThres[10] = Integer.MAX_VALUE - Rg.rng.nextInt(9999);
 		
@@ -43,7 +42,7 @@ public class PlayState extends FlxState
 		bg = new FlxSprite(0,0);
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFF000000);
 		
-		t = new FlxText(0, 0, 600, "FruitSwirl Alpha");
+		t = new FlxText(0, 0, 600, "FruitSwirl Alpha 1.1");
 		
 		lvlComplete = new FlxSprite();
 		lvlComplete.loadGraphic("lvl_complete.png");

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FruitSwirl</string>
-    <string name="fsalphaname">Fruit Swirl Alpha</string>
+    <string name="app_name">FruitSwirl Alpha</string>
+    <string name="fsalphaname">Fruit Swirl Alpha 1.1</string>
     <string name="app_desc">FruitSwirl is a proof of concept game for Android based on a popular game by PopCap.</string>
 </resources>

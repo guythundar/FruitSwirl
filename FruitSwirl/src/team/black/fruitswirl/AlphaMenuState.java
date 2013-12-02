@@ -19,7 +19,7 @@ public class AlphaMenuState extends FlxState {
 		bg = new FlxSprite(0, 0);
 		bg.makeGraphic(FlxG.width, FlxG.height, 0x111111);
 		
-		t = new FlxText(0, 0, 600, "FruitSwirl Alpha");
+		t = new FlxText(0, 0, 600, "FruitSwirl Alpha 1.1");
 		
 		teamblacklogo = new FlxSprite();
 		teamblacklogo.loadGraphic("teamblacklogo.png");
