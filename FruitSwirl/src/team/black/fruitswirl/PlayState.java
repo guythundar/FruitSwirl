@@ -17,7 +17,7 @@ public class PlayState extends FlxState
 {
 	private Grid g;
 	private FlxSprite bg, lvlComplete;
-	private FlxText t, scoreText, lvlcompletetexta, lvlcompletetextb;
+	private FlxText t, scoreText, lvlText, lvlcompletetexta, lvlcompletetextb;
 	private boolean justTapped = false;
 	private FlxPoint mpos = new FlxPoint(0,0);
 	private FlxButton lvl_ok, lvl_cancel;
@@ -33,8 +33,9 @@ public class PlayState extends FlxState
 	{
 		
 		//level score thresholds
-		for ( int i = 0; i < 10; i++ )
-			levelThres[i] += 50 + ( i * 75 );
+		levelThres[0] = 50;
+		for ( int i = 1; i < 10; i++ )
+			levelThres[i] += levelThres[i-1] + 50 + ( i * 25 );
 		//try and score this much!
 		levelThres[10] = Integer.MAX_VALUE - Rg.rng.nextInt(9999);
 		
@@ -72,7 +73,8 @@ public class PlayState extends FlxState
 		g.makeFirstBoard();
 		g.initGravityPoints();
 		
-		scoreText = new FlxText(g.minPoint.x, g.maxPoint.y + Fruit.SIZE_Y + 3, 200, "Score: 0");		
+		lvlText = new FlxText(g.minPoint.x, g.maxPoint.y + Fruit.SIZE_Y + 3, 50, "Level: 1");
+		scoreText = new FlxText(lvlText.x + 50, lvlText.y, 200, "Score: 0");
 		
 		Rg.spinner.alignToGridMember(g.getFirstVisible());
 		
@@ -89,6 +91,7 @@ public class PlayState extends FlxState
 		gameStuff.add(g.fruits);
 		gameStuff.add(guideGridPoints);
 		gameStuff.add(scoreText);
+		gameStuff.add(lvlText);
 		
 		//render
 		add(bg);
@@ -119,6 +122,12 @@ public class PlayState extends FlxState
 		}
 		
 		if ( !Rg.paused ){
+			if ( Rg.animLock ){
+				Rg.animLockTimer += FlxG.elapsed;
+				if ( Rg.animLockTimer > Rg.animLockoutTime )
+					Rg.animationUnlock();
+			} else g.updateDrawables();
+			
 			int fingers_down = 0;		
 			justTapped = FlxG.mouse.justPressed();
 			if ( FlxG.mouse.pressed() ){

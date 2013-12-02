@@ -132,10 +132,10 @@ public class Grid {
 	}
 	
 	public void setOffscreenVisible(boolean b){
-		for ( int i = 0; i < fruits.length; i++){
-			Fruit f = (Fruit) fruits.members.get(i);
-			if (f.y < minPoint.y)
-				f.visible = b;
+		for ( int i = 0; i < FRUITS_PER_ROW; i++){
+			for ( int j = 0; j < FRUITS_PER_COL; j++){
+				currentFruits[i][j].visible = b;
+			}
 		}
 	}
 	
@@ -235,25 +235,25 @@ public class Grid {
 		Point ref = Rg.spinner.getCollidePos();
 		
 		//signal the drawables to start animating
-		FlxPoint p = new FlxPoint(currentFruits[ref.x+1][ref.y].x,
-									currentFruits[ref.x+1][ref.y].y );
+		FlxPoint p = new FlxPoint(gridPoints[ref.x+1][ref.y].x,
+									gridPoints[ref.x+1][ref.y].y );
 		Tween.to(currentFruits[ref.x][ref.y], TweenSprite.XY, 1f)
 	     .target(p.x, p.y).start(TweenPlugin.manager);
 		
-		p = new FlxPoint(currentFruits[ref.x+1][ref.y+1].x,
-				currentFruits[ref.x+1][ref.y+1].y );
+		p = new FlxPoint(gridPoints[ref.x+1][ref.y+1].x,
+							gridPoints[ref.x+1][ref.y+1].y );
 		Tween.to(currentFruits[ref.x+1][ref.y], TweenSprite.XY, 1f)
 		     .target(p.x, p.y).start(TweenPlugin.manager);
 		
-		p = new FlxPoint(currentFruits[ref.x][ref.y+1].x,
-				currentFruits[ref.x][ref.y+1].y );
+		p = new FlxPoint(gridPoints[ref.x][ref.y+1].x,
+							gridPoints[ref.x][ref.y+1].y );
 		Tween.to(currentFruits[ref.x+1][ref.y+1], TweenSprite.XY, 1f)
 	     .target(p.x, p.y).start(TweenPlugin.manager);
 		
-		p = new FlxPoint(currentFruits[ref.x][ref.y].x,
-				currentFruits[ref.x][ref.y].y );
+		p = new FlxPoint(gridPoints[ref.x][ref.y].x,
+							gridPoints[ref.x][ref.y].y );
 		Tween.to(currentFruits[ref.x][ref.y+1], TweenSprite.XY, 1f)
-	     .target(p.x, p.y).call(afterSpin).start(TweenPlugin.manager);
+	     .target(p.x, p.y).start(TweenPlugin.manager);
 		
 		swapFruits(ref.x, ref.y, ref.x+1, ref.y);
 		swapFruits(ref.x, ref.y, ref.x+1, ref.y+1);
@@ -261,16 +261,9 @@ public class Grid {
 		
 		swapChoices(ref.x, ref.y, ref.x+1, ref.y);
 		swapChoices(ref.x, ref.y, ref.x+1, ref.y+1);
-		swapChoices(ref.x, ref.y, ref.x, ref.y+1);		
+		swapChoices(ref.x, ref.y, ref.x, ref.y+1);
+		Rg.animationLock();
 	}
-	
-	private TweenCallback afterSpin = new TweenCallback() {
-		
-		@Override
-		public void onEvent(int arg0, BaseTween<?> arg1) {
-			updateDrawables();
-		}
-	};
 	
 	private void swapChoices(int ox, int oy, int nx, int ny){
 		int i = currentChoices[ox][oy];
@@ -407,7 +400,7 @@ public class Grid {
 					FlxPoint p = new FlxPoint(gridPoints[i][j+1].x,
 							gridPoints[i][j+1].y );
 					Tween.to(currentFruits[i][j], TweenSprite.Y, 1f)
-				     .target(p.x, p.y).call(afterSpin).start(TweenPlugin.manager);
+				     .target(p.x, p.y).start(TweenPlugin.manager);
 					
 					swapFruits(i, j, i, j+1);
 					swapChoices(i, j, i, j+1);
@@ -424,8 +417,8 @@ public class Grid {
 		}
 		
 		choicesToFruits();
-		updateDrawables();
 		setOffscreenVisible(false);
+		Rg.animationLock();
 	}
 	
 }
