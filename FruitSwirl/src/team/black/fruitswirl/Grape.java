@@ -5,7 +5,7 @@ public class Grape extends Fruit {
 	public Grape(float _ix, float _iy) {
 		super(_ix, _iy);
 //		makeTestSprite(0xFF800080);
-		loadGraphic("exported_2.png");
+		loadGraphic("grape_alpha.png");
 	}
 
 	@Override
